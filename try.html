@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Create Category</title>
+</head>
+<body>
+
+    <h2>Create Category</h2>
+
+    <form id="categoryForm">
+        <div>
+            <label>Name:</label>
+            <input type="text" name="name" required />
+        </div>
+        <br/>
+
+        <div>
+            <label>Description:</label>
+            <input type="text" name="description" />
+        </div>
+        <br/>
+
+        <div>
+            <label>Status:</label>
+            <select name="status">
+                <option value="true">Active</option>
+                <option value="false">Inactive</option>
+            </select>
+        </div>
+        <br/>
+
+        <div>
+            <label>Image:</label>
+            <input type="file" name="image" accept="image/*" required />
+        </div>
+        <br/>
+
+        <button type="submit">Create Category</button>
+    </form>
+
+    <p id="responseMsg"></p>
+
+    <script>
+        const form = document.getElementById("categoryForm");
+        const responseMsg = document.getElementById("responseMsg");
+
+        form.addEventListener("submit", async (e) => {
+            e.preventDefault();
+
+            const formData = new FormData(form);
+
+            try {
+                const res = await fetch("http://localhost:3000/api/v1/Category/Create", {
+                    method: "POST",
+                    body: formData
+                });
+
+                const data = await res.json();
+
+                if (res.ok) {
+                    responseMsg.style.color = "green";
+                    responseMsg.innerText = "✅ Category Created Successfully";
+                    form.reset();
+                } else {
+                    responseMsg.style.color = "red";
+                    responseMsg.innerText = data.message || "❌ Error occurred";
+                }
+
+            } catch (error) {
+                console.error(error);
+                responseMsg.style.color = "red";
+                responseMsg.innerText = "❌ Server Error";
+            }
+        });
+    </script>
+
+</body>
+</html>

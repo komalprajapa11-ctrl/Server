@@ -7,21 +7,18 @@ const Categories = new mongoose.Schema({
         unique: [true, "Category already exists"],
         trim: true,
         uppercase: true,
-
     },
     Image: {
-
+        type: String,
     },
     description: {
         type: String,
     },
-    statuss: {
+    status: {
         type: Boolean,
         default: true,
         enum: [true, false]
-
-
     }
-})
+}, { timestamps: true })
 
 export default mongoose.model("Categories", Categories)
