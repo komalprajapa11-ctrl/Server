@@ -10,11 +10,14 @@ export const CreateCategory = async (req, res) => {
 
         let ImageURL = ""
 
+        
         if (req.file) {
             try {
                 const upload = await cloudinary.uploader.upload(req.file.path, {
                     folder: "Categories"
                 })
+
+
 
                 ImageURL = upload.secure_url
                 console.log("Cloudinary URL:", ImageURL);
@@ -23,17 +26,18 @@ export const CreateCategory = async (req, res) => {
                 fs.unlinkSync(req.file.path)
             } catch (err) {
                 console.error("Cloudinary Error:", err);
+                console.log(process.env.CLOUDINARY_API_KEY, process.env.CLOUDINARY_API_SECRET, process.env.CLOUDINARY_CLOUD_NAME)
                 return res.status(500).json({
                     message: "Cloudinary upload failed",
-                    error: err.message
+                    error: err
                 })
             }
         }
 
-        const category = await CategoriesModule.create({ 
-            name, 
-            Image: ImageURL, 
-            description 
+        const category = await CategoriesModule.create({
+            name,
+            Image: ImageURL,
+            description
         })
 
         return res.status(201).json({
@@ -54,6 +58,98 @@ export const CreateCategory = async (req, res) => {
         }
 
         res.status(500).json({
+            message: "Internal Server Error",
+            error: e.message
+        })
+    }
+}
+
+
+
+// export const GetAllCatrgory = async (req, res) => {
+//     try {
+//         const catrgory = await CategoriesModule.find()
+//         res.status(200).json({
+//             message: "All Category",
+//             catrgory
+//         })
+//     }
+//     catch (e) {
+//         res.status.json({
+//             message: "Internal Server Error",
+//             error: e.message
+//         })
+//     }
+// }
+
+
+export const GetAllCatrgory = async (req, res) => {
+    try {
+        const catrgory = await CategoriesModule.find()
+        res.status(200).json({
+            message: "All Category",
+            catrgory
+        })
+    }
+    catch (e) {
+        res.status.json({
+            message: "Internal Server Error",
+            error: e.message
+        })
+    }
+}
+
+
+export const GetByIDCatrgory = async (req, res) => {
+    try {
+        const { id } = req.params
+        const catrgory = await CategoriesModule.findById(id)
+        res.status(200).json({
+            message: "All Category",
+            catrgory
+        })
+    }
+    catch (e) {
+        res.status.json({
+            message: "Internal Server Error",
+            error: e.message
+        })
+    }
+}
+
+
+export const UpdateCategory = async (req, res) => {
+    try {
+        const { name, description } = req.body
+        const { id } = req.params
+
+        let updateData = {
+            name,
+            description
+
+        }
+
+        if (req.file) {
+
+            const upload = await cloudinary.uploader.upload(req.file.path)
+            updateData.Image = upload.secure_url
+            // Clean up file after upload
+            fs.unlinkSync(req.file.path)
+        }
+
+
+        const category = await CategoriesModule.findByIdAndUpdate(id, updateData, { new: true })
+
+        return res.status(200).json({
+            message: "Category Updated Successfully",
+            category
+        })
+
+
+
+    }
+    catch (e) {
+        res.status.json({
             message: "Internal Server Error",
             error: e.message
         })
