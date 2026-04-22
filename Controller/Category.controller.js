@@ -16,9 +16,6 @@ export const CreateCategory = async (req, res) => {
                 const upload = await cloudinary.uploader.upload(req.file.path, {
                     folder: "Categories"
                 })
-
-
-
                 ImageURL = upload.secure_url
                 console.log("Cloudinary URL:", ImageURL);
 

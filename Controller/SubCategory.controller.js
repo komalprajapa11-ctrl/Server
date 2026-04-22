@@ -12,7 +12,7 @@ export const CreateSubCategory = async (req, res) => {
     console.log("CreateSubCategory req.body:", req.body)
     console.log("CreateSubCategory req.file:", req.file)
 
-    if (!name   ) {
+    if (!name) {
       return res.status(400).json({
         success: false,
         message: "All fields are required"
@@ -71,6 +71,87 @@ export const CreateSubCategory = async (req, res) => {
       error: error.message
     })
   }
-}  
+}
 
 
+
+export const GetAllSubCategories = async (req, res) => {
+  try {
+    const Subcategory = await SubCategoriesModule.find()
+
+    return res.status(200).json({
+      success: true,
+      message: "SubCategories fetched successfully",
+      Subcategory
+    })
+
+  }
+  catch (e) {
+    res.status(500).json({
+      success: false,
+      message: "Failed to get subcategories",
+      error: e.message
+    })
+  }
+}
+
+export const GetSubCategoryById = async (req, res) => {
+  try{
+    const{id} =req.parms
+ 
+    const Subca = await SubCategoriesModule.findById(id)
+    return res.status(200).json({
+      success: true,
+      message: "SubCategory fetched successfully",
+      Subca
+    })
+  }
+  catch (e) {
+    res.status(500).json({
+      success: false, 
+      message: "Failed to get subcategory",
+      error: e.message
+    })
+  }
+}
+
+
+export const UpdateSubCategory = async (req, res) => {
+  try{
+      const{name ,description} = req.body
+      const{id} = req.params
+      const file=req.file
+      const updateData = {
+          name,
+          description
+          
+      }
+      let ImageUrl = ""
+
+      if(file){
+        const upload = await cloudinary.uploder.upload(file,{
+        folder: "SubCategory"
+
+        })
+        ImageUrl = upload.secure_url
+        updateData.imageUrl = ImageUrl
+      }
+      
+      const Update = await SubCategoriesModule.findByIdAndUpdate(id,updateData,{
+        new: true
+      })
+      
+      return res.status(200).json({
+        success: true,
+        message: "SubCategory updated successfully",
+        Update
+      })
+  }
+  catch(e){
+    res.status(500).json({
+      success: false,
+      message: "Failed to update subcategory",
+      error: e.message
+    })
+  }
+}
